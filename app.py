@@ -54,10 +54,10 @@ def clean_text(text):
     return ' '.join(tokens)
 
 def prepare_features(text, cleaned_text):
-    # Step 1 — TF-IDF on cleaned text
+    # TF-IDF on cleaned text
     tfidf_vec = tfidf.transform([cleaned_text])
 
-    # Step 2 — Extract 12 numerical features
+    # Extract 12 numerical features
     vader_scores = analyzer.polarity_scores(text)
     blob = TextBlob(text)
 
@@ -76,10 +76,10 @@ def prepare_features(text, cleaned_text):
         float(100)                                 # subreddit_activity placeholder
     ]], dtype=np.float32)
 
-    # Step 3 — Scale numerical features
+    # Scale numerical features
     numerical_scaled = scaler.transform(numerical)
 
-    # Step 4 — Combine TF-IDF + numerical
+    # Combine TF-IDF + numerical
     import scipy.sparse as sp
     numerical_sparse = sp.csr_matrix(numerical_scaled)
     combined = sp.hstack([tfidf_vec, numerical_sparse])
@@ -87,7 +87,7 @@ def prepare_features(text, cleaned_text):
     print(f"Combined shape: {combined.shape}")
     print(f"RF expects: {N_FEATURES}")
 
-    # Step 5 — Match exact feature count
+    # Match exact feature count
     combined_cols = combined.shape[1]
     if combined_cols >= N_FEATURES:
         final = combined[:, :N_FEATURES].toarray()
@@ -97,24 +97,8 @@ def prepare_features(text, cleaned_text):
 
     return final.astype(np.float32)
 
-# Add right after loading models
-print(f"TF-IDF vocabulary size: {len(tfidf.vocabulary_)}")
-print(f"RF model expects: {rf_model.n_features_in_} features")
-print(f"Label classes: {list(le.classes_)}")
 
-# Test with a sample — pass both text and cleaned
-test_text = "I am very angry about this situation"
-test_clean = clean_text(test_text)
-test_features = prepare_features(test_text, test_clean)
-test_pred = rf_model.predict(test_features)[0]
-test_emotion = le.inverse_transform([test_pred])[0]
-print(f"Test prediction: {test_emotion}")
-
-print(f" All models loaded — RF expects {N_FEATURES} features")
-print(f" Emotion classes: {list(le.classes_)}")
-
-
-# Community Mapping — Unique Per Emotion
+# Community Mapping 
 community_map = {
     'anger': {
         'communities': [
