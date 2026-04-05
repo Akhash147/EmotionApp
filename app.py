@@ -23,9 +23,8 @@ nltk.download('punkt_tab', quiet=True)
 app = Flask(__name__)
 CORS(app)
 
-# ============================================
+
 # Load Models
-# ============================================
 print("Loading models...")
 rf_model = pickle.load(open('models/rf_model.pkl', 'rb'))
 tfidf = pickle.load(open('models/tfidf_vectorizer.pkl', 'rb'))
@@ -34,9 +33,8 @@ scaler = pickle.load(open('models/scaler.pkl', 'rb'))
 intervention_db = pd.read_csv('models/intervention_knowledge_base.csv')
 
 N_FEATURES = rf_model.n_features_in_
-# ============================================
+
 # Preprocessing
-# ============================================
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
 analyzer = SentimentIntensityAnalyzer()
@@ -60,7 +58,6 @@ def prepare_features(text, cleaned_text):
     tfidf_vec = tfidf.transform([cleaned_text])
 
     # Step 2 — Extract 12 numerical features
-    # These MUST match exactly what was used in training
     vader_scores = analyzer.polarity_scores(text)
     blob = TextBlob(text)
 
@@ -113,12 +110,11 @@ test_pred = rf_model.predict(test_features)[0]
 test_emotion = le.inverse_transform([test_pred])[0]
 print(f"Test prediction: {test_emotion}")
 
-print(f"✅ All models loaded — RF expects {N_FEATURES} features")
-print(f"✅ Emotion classes: {list(le.classes_)}")
+print(f" All models loaded — RF expects {N_FEATURES} features")
+print(f" Emotion classes: {list(le.classes_)}")
 
-# ============================================
+
 # Community Mapping — Unique Per Emotion
-# ============================================
 community_map = {
     'anger': {
         'communities': [
@@ -381,9 +377,7 @@ def get_emotion_data(emotion):
             return community_map[key]
     return community_map['neutral']
 
-# ============================================
 # Predict Route
-# ============================================
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
