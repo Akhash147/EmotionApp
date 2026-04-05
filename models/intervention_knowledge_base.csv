@@ -1,0 +1,29 @@
+emotion,emotion_group,intervention,urgency,response_time
+admiration,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+amusement,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+anger,High Anger,Issue immediate calm public statement,CRITICAL,Within 1 hour
+annoyance,High Anger,Issue immediate calm public statement,CRITICAL,Within 1 hour
+approval,High Empathy,Engage community with support resources,MEDIUM,Within 6 hours
+caring,High Empathy,Engage community with support resources,MEDIUM,Within 6 hours
+confusion,High Curiosity,Release informative educational content,MEDIUM,Within 6 hours
+curiosity,High Curiosity,Release informative educational content,MEDIUM,Within 6 hours
+desire,High Empathy,Engage community with support resources,MEDIUM,Within 6 hours
+disappointment,High Sadness,Launch mental health awareness campaign,HIGH,Within 4 hours
+disapproval,High Anger,Issue immediate calm public statement,CRITICAL,Within 1 hour
+disgust,High Anger,Issue immediate calm public statement,CRITICAL,Within 1 hour
+embarrassment,Neutral,Monitor and observe community activity,LOW,Within 48 hours
+excitement,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+fear,High Fear,Publish verified facts to counter panic,HIGH,Within 2 hours
+gratitude,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+grief,High Sadness,Launch mental health awareness campaign,HIGH,Within 4 hours
+joy,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+love,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+nervousness,High Fear,Publish verified facts to counter panic,HIGH,Within 2 hours
+neutral,Neutral,Monitor and observe community activity,LOW,Within 48 hours
+optimism,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+pride,High Positivity,Capitalize with positive engagement campaign,LOW,Within 24 hours
+realization,High Curiosity,Release informative educational content,MEDIUM,Within 6 hours
+relief,Neutral,Monitor and observe community activity,LOW,Within 48 hours
+remorse,High Sadness,Launch mental health awareness campaign,HIGH,Within 4 hours
+sadness,High Sadness,Launch mental health awareness campaign,HIGH,Within 4 hours
+surprise,High Curiosity,Release informative educational content,MEDIUM,Within 6 hours

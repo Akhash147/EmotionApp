@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Epidemic Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e1e4e8;
+            min-height: 100vh;
+        }
+
+        nav {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #6e40c9, #0366d6);
+            border-radius: 8px;
+            display: flex; align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .nav-badge {
+            font-size: 11px;
+            background: #1f6feb33;
+            color: #58a6ff;
+            border: 1px solid #1f6feb;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #f0f6fc;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #6e40c9, #0366d6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #8b949e;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .input-section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #e1e4e8;
+            font-size: 15px;
+            padding: 14px;
+            min-height: 130px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #388bfd;
+        }
+
+        textarea::placeholder { color: #484f58; }
+
+        .examples-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .example-btn {
+            font-size: 12px;
+            color: #8b949e;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 5px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            color: #e1e4e8;
+            border-color: #58a6ff;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #6e40c9, #0366d6);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-analyze:hover { opacity: 0.85; }
+        .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-clear {
+            background: transparent;
+            color: #8b949e;
+            border: 1px solid #30363d;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #21262d;
+            color: #e1e4e8;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #30363d;
+            border-top-color: #6e40c9;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading p {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .results { display: none; }
+
+        .emotion-banner {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+
+        .banner-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .emotion-main {
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .urgency-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .urgency-CRITICAL {
+            background: #3d1f1f;
+            color: #f85149;
+            border: 1px solid #f85149;
+        }
+
+        .urgency-HIGH {
+            background: #2d1f0e;
+            color: #e3b341;
+            border: 1px solid #e3b341;
+        }
+
+        .urgency-MEDIUM {
+            background: #1a2f1a;
+            color: #3fb950;
+            border: 1px solid #3fb950;
+        }
+
+        .urgency-LOW {
+            background: #1f2a3d;
+            color: #58a6ff;
+            border: 1px solid #58a6ff;
+        }
+
+        .top-emotions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .emotion-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 10px 18px;
+            min-width: 100px;
+        }
+
+        .emotion-pill-name {
+            font-size: 13px;
+            text-transform: capitalize;
+            margin-bottom: 4px;
+        }
+
+        .emotion-pill-prob {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .grid2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #8b949e;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .community-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #21262d;
+            align-items: flex-start;
+        }
+
+        .community-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .community-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 600;
+            flex-shrink: 0;
+            background: #21262d;
+            color: #e1e4e8;
+        }
+
+        .community-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 3px;
+        }
+
+        .community-reason {
+            font-size: 12px;
+            color: #8b949e;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        .severity-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #21262d;
+            overflow: hidden;
+        }
+
+        .severity-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+
+        .precaution-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .precaution-num {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #1f3a5f;
+            color: #58a6ff;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex; align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .precaution-text {
+            font-size: 14px;
+            color: #e1e4e8;
+            line-height: 1.6;
+        }
+
+        .spread-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .spread-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .spread-time {
+            font-size: 12px;
+            color: #8b949e;
+            min-width: 120px;
+        }
+
+        .spread-community {
+            font-size: 14px;
+            color: #e1e4e8;
+            flex: 1;
+        }
+
+        .spread-prob {
+            font-size: 13px;
+            font-weight: 600;
+            color: #58a6ff;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .spread-bar {
+            height: 3px;
+            border-radius: 2px;
+            background: #21262d;
+            margin-top: 6px;
+        }
+
+        .spread-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #6e40c9, #0366d6);
+        }
+
+        .error-msg {
+            background: #3d1f1f;
+            border: 1px solid #f85149;
+            border-radius: 8px;
+            padding: 16px;
+            color: #f85149;
+            font-size: 14px;
+            display: none;
+            margin-top: 16px;
+        }
+
+        .sentiment-chip {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #484f58;
+            font-size: 13px;
+            border-top: 1px solid #21262d;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">🌊</div>
+    <span class="nav-title">Emotion Epidemic Tracker</span>
+    <span class="nav-badge">ML Powered</span>
+</nav>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>Predict How Emotions<br><span>Spread Across Communities</span></h1>
+        <p>Enter any social media post or statement. Our trained ML model will detect the emotion, identify which communities will be affected, and suggest precautionary actions.</p>
+    </div>
+
+    <div class="input-section">
+        <label class="input-label">Enter a social media post or statement</label>
+        <textarea id="postInput" placeholder="Type or paste any post here... e.g. 'This government policy is completely destroying our economy and nobody cares!'"></textarea>
+
+        <div class="examples-row">
+            <span style="font-size:12px;color:#484f58;align-self:center;">Try:</span>
+            <button class="example-btn" onclick="setExample(0)">Political controversy</button>
+            <button class="example-btn" onclick="setExample(1)">Health scare</button>
+            <button class="example-btn" onclick="setExample(2)">Positive news</button>
+            <button class="example-btn" onclick="setExample(3)">Environmental issue</button>
+            <button class="example-btn" onclick="setExample(4)">Tech announcement</button>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-analyze" onclick="analyze()" id="analyzeBtn">
+                Analyze Post
+            </button>
+            <button class="btn-clear" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Analyzing emotional patterns...</p>
+    </div>
+
+    <div class="results" id="results"></div>
+
+</div>
+
+<footer>
+    Emotion Epidemic Tracker — Built with GoEmotions Dataset + Random Forest ML Model
+</footer>
+
+<script>
+const examples = [
+    "This government policy is completely destroying our economy and nobody seems to care about regular people anymore!",
+    "Scientists warn that this new virus strain could spread rapidly and we are not prepared at all. Everyone should be worried.",
+    "Just got promoted to Senior Engineer after 3 years of hard work! Dreams do come true if you keep pushing forward!",
+    "Another oil spill has devastated the coastline. Thousands of animals are dying and corporations face zero consequences.",
+    "The new AI model just passed every benchmark. This changes everything we thought we knew about artificial intelligence."
+];
+
+function setExample(idx) {
+    document.getElementById('postInput').value = examples[idx];
+}
+
+function clearAll() {
+    document.getElementById('postInput').value = '';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+
+function getSeverityColor(severity) {
+    if (severity >= 80) return '#f85149';
+    if (severity >= 60) return '#e3b341';
+    if (severity >= 40) return '#3fb950';
+    return '#58a6ff';
+}
+
+function getEmotionColor(emotion) {
+    const colors = {
+        anger: '#f85149', annoyance: '#e3b341',
+        fear: '#a371f7', sadness: '#58a6ff',
+        joy: '#3fb950', excitement: '#3fb950',
+        disgust: '#f0883e', surprise: '#a371f7',
+        neutral: '#8b949e', gratitude: '#3fb950',
+        admiration: '#58a6ff', love: '#f78166',
+        curiosity: '#a371f7', confusion: '#e3b341',
+        disappointment: '#8b949e', disapproval: '#f85149',
+        caring: '#3fb950', optimism: '#3fb950'
+    };
+    return colors[emotion] || '#58a6ff';
+}
+
+function getBannerStyle(emotion) {
+    const color = getEmotionColor(emotion);
+    return `background: ${color}15; border-color: ${color}40;`;
+}
+
+function getPrecautions(emotion, urgency) {
+    const precautions = {
+        anger: [
+            'Issue a calm and factual public statement within 1 hour',
+            'Avoid defensive or inflammatory responses online',
+            'Engage community moderators to reduce escalation',
+            'Monitor hashtags and trending topics for spread',
+            'Prepare a crisis communication team immediately'
+        ],
+        fear: [
+            'Publish verified and factual information immediately',
+            'Partner with trusted authorities to counter misinformation',
+            'Set up a dedicated FAQ page to address concerns',
+            'Avoid sensational language in all communications',
+            'Monitor mental health impact in affected communities'
+        ],
+        sadness: [
+            'Launch a mental health awareness campaign',
+            'Share supportive and empathetic messaging',
+            'Connect affected communities with support resources',
+            'Avoid trivializing or dismissing community concerns',
+            'Engage mental health professionals for guidance'
+        ],
+        joy: [
+            'Amplify the positive message across channels',
+            'Engage with the community to sustain momentum',
+            'Share authentic stories related to the positive event',
+            'Use this opportunity to strengthen brand trust',
+            'Create follow-up content to maintain engagement'
+        ],
+        disgust: [
+            'Acknowledge the community concern publicly and sincerely',
+            'Take visible and immediate corrective action',
+            'Avoid minimizing or dismissing the ethical concerns raised',
+            'Publish a detailed accountability statement',
+            'Engage ethics experts to review and respond'
+        ],
+        surprise: [
+            'Provide clear and detailed context immediately',
+            'Anticipate follow-up questions and prepare answers',
+            'Monitor initial reactions before responding broadly',
+            'Clarify any misunderstandings proactively',
+            'Use official channels for all communications'
+        ],
+        neutral: [
+            'Continue standard community monitoring',
+            'No immediate action required at this time',
+            'Log this post for trend analysis purposes',
+            'Review again if engagement increases significantly',
+            'Maintain normal communication cadence'
+        ]
+    };
+    return precautions[emotion] ||
+        precautions['neutral'];
+}
+
+async function analyze() {
+    const text = document.getElementById('postInput').value.trim();
+    if (!text) {
+        showError('Please enter a post to analyze.');
+        return;
+    }
+
+    document.getElementById('errorMsg').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = true;
+
+    try {
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            showError('Error: ' + data.error);
+            return;
+        }
+
+        renderResults(data);
+
+    } catch (err) {
+        showError('Could not connect to the model API. Make sure Flask is running.');
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('analyzeBtn').disabled = false;
+    }
+}
+
+function renderResults(data) {
+    const emotion = data.emotion;
+    const color = getEmotionColor(emotion);
+    const precautions = data.precautions || getPrecautions(emotion, data.urgency);
+    const sentimentColor = data.vader_compound > 0.05
+        ? '#3fb950' : data.vader_compound < -0.05
+        ? '#f85149' : '#8b949e';
+
+    let html = `
+    <div class="emotion-banner" style="${getBannerStyle(emotion)}">
+        <div class="banner-top">
+            <div>
+                <div style="font-size:12px;color:#8b949e;margin-bottom:6px;">DETECTED EMOTION</div>
+                <div class="emotion-main" style="color:${color}">${emotion}</div>
+                <div style="font-size:13px;color:#8b949e;margin-top:4px;">
+                    Sentiment: ${data.sentiment}
+                    <span class="sentiment-chip" style="background:${sentimentColor}22;color:${sentimentColor};border:1px solid ${sentimentColor}44">
+                        VADER: ${data.vader_compound}
+                    </span>
+                </div>
+            </div>
+            <span class="urgency-badge urgency-${data.urgency}">${data.urgency} URGENCY</span>
+        </div>
+
+        <div style="font-size:12px;color:#8b949e;margin-bottom:8px;">TOP PREDICTED EMOTIONS</div>
+        <div class="top-emotions">
+            ${data.top_emotions.map((e, i) => `
+                <div class="emotion-pill" style="border:1px solid ${i===0 ? color+'44' : '#30363d'}">
+                    <span class="emotion-pill-name" style="color:${i===0 ? color : '#8b949e'}">${e.emotion}</span>
+                    <span class="emotion-pill-prob" style="color:${i===0 ? color : '#e1e4e8'}">${e.probability}%</span>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <div class="grid2">
+        <div class="card">
+            <div class="card-title">Affected Communities</div>
+            ${data.communities.map((c, i) => `
+                <div class="community-item">
+                    <div class="community-icon">${['P','N','S'][i] || 'C'}</div>
+                    <div style="flex:1">
+                        <div class="community-name">${c.name}</div>
+                        <div class="community-reason">${c.reason}</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" style="width:${c.severity}%;background:${getSeverityColor(c.severity)}"></div>
+                        </div>
+                        <div style="font-size:11px;color:#484f58;margin-top:3px">Impact severity: ${c.severity}%</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="card">
+            <div class="card-title">Precautionary Measures</div>
+            <div style="font-size:12px;color:#8b949e;margin-bottom:12px;">
+                Respond ${data.response_time}
+            </div>
+            ${precautions.map((p, i) => `
+                <div class="precaution-item">
+                    <div class="precaution-num">${i+1}</div>
+                    <div class="precaution-text">${p}</div>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <div class="spread-card">
+        <div class="card-title">Predicted Epidemic Spread Timeline</div>
+        ${data.spread_timeline.map(s => `
+            <div class="spread-row">
+                <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                        <span class="spread-community">${s.community}</span>
+                        <span class="spread-prob">${s.probability}%</span>
+                    </div>
+                    <div style="font-size:12px;color:#484f58;margin-bottom:6px">${s.time}</div>
+                    <div class="spread-bar">
+                        <div class="spread-fill" style="width:${s.probability}%"></div>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Recommended Intervention</div>
+        <div style="font-size:16px;color:#f0f6fc;line-height:1.6;padding:12px;background:#0d1117;border-radius:8px;border-left:3px solid ${color}">
+            ${data.intervention}
+        </div>
+    </div>
+    `;
+
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+document.getElementById('postInput').addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') analyze();
+});
+</script>
+
+</body>
+</html>
